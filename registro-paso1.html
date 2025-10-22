@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Paso 1: Datos</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body> 
+    <div class="form-container">
+        <span class="main-logo-pill" style="margin-top: 20px; margin-bottom: 40px;">access</span>
+
+        <h1>Te damos la bienvenida</h1>
+        <p class="subtitle">Crea tu cuenta y disfruta los beneficios que Access tiene para ti.</p>
+        
+        <form id="registroForm" style="text-align: left;">
+            <div class="form-group">
+                <label for="telefono">Número celular</label>
+                <input type="tel" id="telefono" name="telefono" placeholder="00-0000-0000" required pattern="[0-9]{10}" maxlength="10">
+            </div>
+            <div class="form-group">
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="email" name="email" placeholder="Escribe tu correo electrónico" required>
+            </div>
+            
+            <div class="form-group terminos">
+                <input type="checkbox" id="aceptoTerminos" required>
+                <label for="aceptoTerminos">Declaro ser mayor de edad y acepto los <a href="terminos-y-condiciones.html" target="_blank">Términos y Condiciones</a> y Aviso de Privacidad.</label>
+            </div>
+            
+            <button type="submit" class="btn primary-btn" style="margin-top: 40px; background: var(--button-disabled); color: var(--text-color-light);">Continuar</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('registroForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            localStorage.setItem('userPhone', document.getElementById('telefono').value);
+            localStorage.setItem('userEmail', document.getElementById('email').value);
+            window.location.href = 'verificacion-requisitos.html'; 
+        });
+        
+        const checkbox = document.getElementById('aceptoTerminos');
+        const continueBtn = document.querySelector('.btn');
+
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                continueBtn.disabled = false;
+                continueBtn.style.background = 'linear-gradient(to right, var(--access-gradient-start), var(--access-gradient-end))';
+                continueBtn.style.color = 'white';
+            } else {
+                continueBtn.disabled = true;
+                continueBtn.style.background = 'var(--button-disabled)';
+                continueBtn.style.color = 'var(--text-color-light)';
+            }
+        });
+        continueBtn.disabled = true;
+    </script>
+</body>
+</html>

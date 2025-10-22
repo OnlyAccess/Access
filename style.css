@@ -1,0 +1,125 @@
+/* style.css - Diseño Minimalista Blanco/Azul (Sin Collage) */
+
+:root {
+    /* Variables de Color del Diseño Minimalista */
+    --bg-color-primary: #FFFFFF; /* Fondo principal BLANCO */
+    --text-color-dark: #1A1A1A; /* Texto principal oscuro */
+    --text-color-light: #555555; /* Subtítulos gris oscuro */
+    
+    /* Variables de Access (Azules y Cian) */
+    --access-blue: #0081FF;     
+    --access-cyan: #56CCF2;    
+    --access-light-blue: #C0E8F8; 
+    --access-gradient-start: var(--access-blue); 
+    --access-gradient-end: #4C9AFF; 
+    
+    --button-disabled: #E0E0E0;
+    --success-green: #27AE60;
+    --heart-color: var(--access-blue); 
+    --main-width: 330px; 
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* 🟢 Se asegura que la fuente sea limpia */
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color-primary); 
+    color: var(--text-color-dark);
+    min-height: 100vh; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; 
+    text-align: center;
+    position: relative;
+    overflow-x: hidden; 
+}
+
+/* --- Centrado General de Contenido --- */
+.center-screen {
+    flex-grow: 1; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Contenedores de Diseño General (Formularios y Verificación) */
+.main-content, .form-container, .aviso-container, .cam-container, .success-container {
+    padding: 40px 25px; 
+    background-color: var(--bg-color-primary); 
+    box-shadow: none; 
+    width: 100vw; 
+    max-width: 100%;
+    margin: 0;
+    min-height: 100vh;
+    text-align: left;
+}
+
+/* 🟢 ESTILOS DE INICIO (Solo el contenido principal) */
+.main-content {
+    background-color: transparent !important; /* No necesita fondo */
+    box-shadow: none !important; 
+    width: var(--main-width);
+    max-width: 90%; 
+    z-index: 2; 
+    padding: 0;
+    text-align: center;
+}
+
+/* --- Tipografía y Elementos de Interfaz --- */
+h1 { font-size: 2.5rem; font-weight: 700; color: var(--text-color-dark); }
+.subtitle { font-size: 1rem; color: var(--text-color-light); margin-bottom: 30px; }
+.heart-icon { font-size: 5rem; color: var(--heart-color); margin-bottom: 5px; text-shadow: 0 0 20px rgba(0, 129, 255, 0.6); }
+
+/* --- Botón Píldora (access) --- */
+.main-logo-pill {
+    padding: 8px 15px;
+    background-color: var(--access-light-blue);
+    color: var(--text-color-dark);
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+/* --- Botones y Campos --- */
+.btn { width: 100%; padding: 14px 25px; border-radius: 10px; font-size: 1.1rem; font-weight: 600; border: none; }
+.primary-btn { 
+    background: linear-gradient(to right, var(--access-gradient-start), var(--access-gradient-end)); 
+    color: white; 
+    box-shadow: 0 4px 15px rgba(0, 129, 255, 0.4); 
+}
+.form-group label { color: var(--text-color-light); font-weight: 600; margin-bottom: 8px; }
+.form-group input {
+    background-color: var(--bg-color-primary) !important;
+    border: 1px solid var(--button-disabled) !important;
+    color: var(--text-color-dark) !important;
+    padding: 18px 15px !important;
+    font-size: 1.1rem !important;
+    border-radius: 8px !important;
+}
+
+/* Estilos de Cámara/Verificación (Se mantienen los colores de los iconos) */
+.requisito-list .icon { color: var(--access-blue); }
+#video-frame { border: 2px solid var(--access-blue); }
+.success-icon { color: var(--success-green); }
+
+/* Media Query para Escritorio */
+@media (min-width: 600px) {
+    .main-content { margin: 50px auto; }
+    .form-container, .aviso-container, .cam-container, .success-container {
+        width: 380px; 
+        max-width: 90%;
+        min-height: auto; 
+        margin: 50px auto;
+        border: 1px solid var(--button-disabled); /* Borde para simular App en PC */
+        border-radius: 15px;
+    }
+}

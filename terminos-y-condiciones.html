@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Términos y Condiciones</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .terms-content {
+            max-width: 700px;
+            padding: 30px;
+            background-color: var(--bg-color-primary);
+            border-radius: 10px;
+            text-align: left;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .terms-content h2 { color: var(--access-blue); margin-top: 15px; }
+        .terms-content p, .terms-content ul { font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px; color: var(--text-color-dark); }
+        .back-link { 
+            color: var(--access-blue); 
+            text-decoration: none; 
+            font-size: 1rem; 
+            margin-bottom: 20px; 
+            display: block;
+        }
+    </style>
+</head>
+<body class="white-bg">
+    <div class="terms-content">
+        <a href="javascript:history.back()" class="back-link">← Volver a la página anterior</a>
+        <h1>Términos y Condiciones de Servicio (OnlyAccess)</h1>
+        
+        <h2>1. Mayoría de Edad</h2>
+        <p>Al utilizar nuestra plataforma, usted declara y garantiza que tiene al menos **18 años de edad** o la mayoría de edad legal en su jurisdicción. El incumplimiento de este requisito resultará en la cancelación inmediata de su cuenta.</p>
+
+        <h2>2. Uso de Datos y Verificación</h2>
+        <p>Para garantizar la seguridad y el cumplimiento legal, requerimos la verificación de su identidad. Al aceptar estos términos, usted autoriza a OnlyAccess a:</p>
+        <ul>
+            <li>Acceder a la cámara de su dispositivo para tomar fotografías de su documento de identidad (anverso y reverso) y una *selfie*.</li>
+            <li>Almacenar estas imágenes de forma segura en nuestros servidores (AWS S3) con el único propósito de validar su identidad y edad.</li>
+            <li>Sus datos personales (teléfono y correo) serán tratados bajo nuestra política de privacidad.</li>
+        </ul>
+        
+        <p style="margin-top: 30px; text-align: center;">Última actualización: 22 de octubre de 2025.</p>
+    </div>
+</body>
+</html>
